@@ -5,28 +5,27 @@ import java.net.Socket;
 
 public class Client {
 
-    public static void main(String[] args) {
+	public static void main(String[] args) {
 
-        try (Socket socket = new Socket("localhost", 3345);
-             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-             DataOutputStream oos = new DataOutputStream(socket.getOutputStream());
-             DataInputStream ois = new DataInputStream(socket.getInputStream())) {
+		try (Socket socket = new Socket("localhost", 3345);
+			 BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+			 DataOutputStream oos = new DataOutputStream(socket.getOutputStream());
+			 DataInputStream ois = new DataInputStream(socket.getInputStream())) {
 
-            while (!socket.isOutputShutdown()) {
+			while (!socket.isOutputShutdown()) {
 
-                if (br.ready()) {
-                    String clientCommand = br.readLine();
+				if (br.ready())
+					continue;
 
-                    oos.writeUTF(clientCommand);
-                    oos.flush();
+				oos.writeUTF(br.readLine());
+				oos.flush();
 
-                    String in = ois.readUTF();
-                    System.out.println(in);
-                }
-            }
+				System.out.println(ois.readUTF());
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 }

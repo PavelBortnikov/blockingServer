@@ -8,26 +8,28 @@ import java.net.Socket;
 
 public class Server {
 
-    public static void main(String[] args) {
-        try (ServerSocket server = new ServerSocket(3345)) {
-            Socket client = server.accept();
-            DataOutputStream out = new DataOutputStream(client.getOutputStream());
-            DataInputStream in = new DataInputStream(client.getInputStream());
+	public static void main(String[] args) {
+		try (ServerSocket serverSocket = new ServerSocket(3345)) {
+			Socket socket = serverSocket.accept();
+			DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+			DataInputStream in = new DataInputStream(socket.getInputStream());
 
-            while (!client.isClosed()) {
-                System.out.println("Server reading from channel");
-                String entry = in.readUTF();
-                System.out.println("READ from client message - " + entry);
+			while (!socket.isClosed()) {
+				String entry = in.readUTF();
+				out.writeUTF("reply - " + entry);
+				out.flush();
+			}
 
-                out.writeUTF("Server reply - " + entry + " - OK");
-                out.flush();
-            }
+			close(in, out, socket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 
-            in.close();
-            out.close();
-            client.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+	private static void close(DataInputStream in, DataOutputStream out, Socket socket) throws IOException {
+		in.close();
+		out.close();
+		socket.close();
+	}
+
 }
